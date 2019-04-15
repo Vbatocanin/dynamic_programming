@@ -1,9 +1,10 @@
-- Big O notation and basic complexity analysis
-- Knapsack algorithm basic principle
+- What is dynamic programming?
+- Simplified Knapsack Problem 
 - Knapsack implementation
-- Knapsack algorithm variation
+- Traditional Knapsack Problem
 - Short lookback concerning Levenshtein distance
 - LCS algorithm
 - Optimizing Diophantine Equations using Rod Cutting algorithm
 - Lesser Known problems that utilize Dynamic programming
+- KMP?
 
