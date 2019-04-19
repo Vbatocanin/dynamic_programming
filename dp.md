@@ -8,7 +8,7 @@ $$
 
 So, if we want to find the `n`-th number in the Fibonacci sequence, we have to know the two numbers preceding the `n`-th in the sequence. However, every single time we want to calculate a different element of the Fibonacci sequence, we have have certain `duplicate` calls in our recursive calls, as can be seen in following image, where we calculate Fibonacci(5):
 
-![Drag Racing](E:\Programming\GitHub\dynamic_programming\graphics\fibonacci1.png)
+![Drag Racing](./graphics/fibonacci1.png)
 
 As you can plainly see, this unmodified recursive solution repeats the same calculations quite a bit,which severely slows down this algorithm. For example, if we want to calculate F(4), we need to calculate F(3) and F(2), however we also need F(2) for F(3). The solution to this problem is `dynamic programming`, where we model a solution as if we were to solve it recursively, but we solve it from the ground up, and **memorize** subproblem solutions. Ergo, for the Fibonacci sequence, we **first** solve and memorize F(1), then F(2), then F(3) using F(2) and F(1) and so on. This means that the calculation of every individual element of the sequence is O(1), because we already know the former two.
 
@@ -24,13 +24,21 @@ Following these rules, let's take a look at some examples of algorithms that use
 
 ### The Simplified Knapsack Problem
 
-The Simplified Knapsack problem is a problem of optimization, which there is no ``one`` solution, but the question is, does one even exist? The problem is as follows:
+The Simplified Knapsack problem is a problem of optimization, for which there is no ``one`` solution. The question for this problem would be, does a solution even exist? The problem is as follows:
 
 > Given a set of items, each with a weight w1,w2... determine the number of each item to put in a knapsack so that the total weight is less than or equal to a given limit K.
 
-So let's take a step back, how will we represent the solutions to this problem? First, let's store the weights of all the items in an array W. Next, lets say that there are n items and lets enumerate them with numbers from 1 to n, so the weight of the i-th item is `W[i]`. We'll form a matrix M of (n+1)x(K+1) dimensions. M\[x\]\[y\] corresponding to the solution of the knapsack problem, but only with the first `x` items of the beginning array, and with a maximum capacity of `y`.
+So let's take a step back, how will we represent the solutions to this problem? First, lets store the weights of all the items in an array W. Next, lets say that there are n items and lets enumerate them with numbers from 1 to n, so the weight of the i-th item is `W[i]`. We'll form a matrix `M` of` (n+1)`x`(K+1)` dimensions. `M[x][y]` corresponding to the solution of the knapsack problem, but only with the first `x` items of the beginning array, and with a maximum capacity of `y`.
 
-There are 2 things to note when filling up the matrix, first, does a solution exist for the given subproblem( M\[x\]\[y\].exists ), AND does the given solution include the newest item added to the array( M\[x\]\[y\].includes ). Therefore, initialization of the matrix is quite easy, M\[0\]\[k\].exists where k>0 is always `false`, because we can't fill a knapsack with no items, however M\[0\]\[0\].exists = true, because the knapsack **should** be empty to begin with. In addition, we can say that M\[k\]\[0\].exists = true and M\[k\]\[0\].includes = false for every `k`.
+#### Example
+
+Let's say we have 3 items, with the weights being `w1=2kg`, `w2=3kg` and `w3=4kg`, how do we optimally fill a knapsack with a capacity of `K=6kg`. Utilizing the method above, we can say for example that `M[1][2]`, this means that we are trying to fill a knapsack with a capacity of `2kg` with just the first item from the weight array (`w1`). While in `M[3][5] ` we are trying to fill up a knapsack with a capacity of `5 kg` using the first `3` items of the weight array (`w1,w2,w3`).
+
+#### Matrix initialization
+
+There are 2 things to note when filling up the matrix, first, does a solution exist for the given subproblem( M\[x\]\[y\].exists ), AND does the given solution include the newest item added to the array( M\[x\]\[y\].includes ). Therefore, initialization of the matrix is quite easy, M\[0\]\[k\].exists, where k>0, is always `false`, because we can't fill a knapsack with no items, however M\[0\]\[0\].exists = true, because the knapsack **should** be empty to begin with. In addition, we can say that M\[k\]\[0\].exists = true and M\[k\]\[0\].includes = false for every `k`.
+
+#### Algorithm principle
 
 Next, let's construct the recurrence relation for ``M[i][k]`` with the following code:
 
@@ -55,6 +63,8 @@ So the gist of the solution is dividing the subproblem into two cases:
 2. When a solution exists for the first `i-1` elements, but for capacity `k-W[i]`
 
 The first case is self explanatory, we already have a solution to the problem, why fix what isn't broken. The second case refers to knowing the solution for the first `i-1` elements, but the capacity is with exactly one `i`-th element short of being full, which means we can just add one i-th element, and we have a new solution!
+
+#### Implementation
 
 In this implementation, to make things easier, we'll make the class `Elem` for storing elements:
 
