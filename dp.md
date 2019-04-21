@@ -1,4 +1,4 @@
-### What is dynamic programming?
+### What is Dynamic Programming?
 
 Dynamic programming is a programming principle where a very complex problem can be solved by dividing it into smaller subproblems. This principle is very similar to recursion, but with a key difference, every distinct subproblem has to be solved only ONCE. To understand what this means, we first have to understand the problem of solving recurrence relations. Every single complex problem can be divided into very similar subproblems, this means we can construct a _recurrence relation_ between them. Let's take a look at an example we all are familiar with, the Fibonacci sequence! The Fibonacci sequence is defined with the following `recurrence relation`:
 
@@ -22,7 +22,76 @@ When solving a problem using dynamic programming, we have to follow these steps:
 
 Following these rules, let's take a look at some examples of algorithms that use dynamic programming:
 
-### The Simplified Knapsack Problem
+
+
+### Rod Cutting Algorithm
+
+Let's start with something simple, the problem goes as follows:
+
+> Given a rod of length n and an array of prices that contains prices of all pieces of size smaller than n. Determine the maximum value obtainable by cutting up the rod and selling the pieces. 
+
+#### Naive Solution
+
+This problem is like tailor-made for dynamic programming, but because this is our first real example, let's see what would happen if we try and solve it traditionally:
+
+```java
+
+public class naive_solution
+{
+    static int getValue (int[] values, int length) {
+        if (length <= 0)
+            return 0;
+        int tmp_max=-1;
+        for (int i=0 ; i < length ; i++) {
+            tmp_max=Math.max (tmp_max, values[i] + getValue (values, length - i - 1));
+        }
+        return tmp_max;
+    }
+
+    public static void main (String[] args) {
+        int[] values=new int[]{3, 7, 1, 3, 9};
+        int rod_length=values.length;
+
+        System.out.println ("Max rod value: " + getValue (values, rod_length));
+
+    }
+}
+```
+
+This solution is highly inefficient, recursive calls aren't memorized so the poor guy has to solve the same subproblem every time there's a single overlapping solution.
+
+#### DP Solution
+
+Utilizing the same basic principle from above, but adding **memoization** and excluding recursive calls, we get the following implementation:
+
+```java
+public class dp_solution
+{
+    static int getValue (int[] values, int rod_length) {
+        int[] sub_solutions=new int[rod_length + 1];
+
+        for (int i=1 ; i <= rod_length ; i++) {
+            int tmp_max=-1;
+            for (int j=0 ; j < i ; j++)
+                tmp_max=Math.max (tmp_max, values[j] + sub_solutions[i - j - 1]);
+            sub_solutions[i]=tmp_max;
+        }
+        return sub_solutions[rod_length];
+    }
+
+    public static void main (String[] args) {
+        int[] values=new int[]{3, 7, 1, 3, 9};
+        int rod_length=values.length;
+
+        System.out.println ("Max rod value: " + getValue (values, rod_length));
+
+    }
+}
+```
+
+We eliminate the need for recursive calls by solving the subproblems from the ground-up, utilizing the fact that all previous subproblems to a given problem are already solved.
+
+### the Simplified Knapsack Problem
 
 The Simplified Knapsack problem is a problem of optimization, for which there is no ``one`` solution. The question for this problem would be, does a solution even exist? The problem is as follows:
 
@@ -34,11 +103,11 @@ So let's take a step back, how will we represent the solutions to this problem? 
 
 Let's say we have 3 items, with the weights being `w1=2kg`, `w2=3kg` and `w3=4kg`, how do we optimally fill a knapsack with a capacity of `K=6kg`. Utilizing the method above, we can say for example that `M[1][2]`, this means that we are trying to fill a knapsack with a capacity of `2kg` with just the first item from the weight array (`w1`). While in `M[3][5] ` we are trying to fill up a knapsack with a capacity of `5 kg` using the first `3` items of the weight array (`w1,w2,w3`).
 
-#### Matrix initialization
+#### Matrix Initialization
 
 There are 2 things to note when filling up the matrix, first, does a solution exist for the given subproblem( M\[x\]\[y\].exists ), AND does the given solution include the newest item added to the array( M\[x\]\[y\].includes ). Therefore, initialization of the matrix is quite easy, M\[0\]\[k\].exists, where k>0, is always `false`, because we can't fill a knapsack with no items, however M\[0\]\[0\].exists = true, because the knapsack **should** be empty to begin with. In addition, we can say that M\[k\]\[0\].exists = true and M\[k\]\[0\].includes = false for every `k`.
 
-#### Algorithm principle
+#### Algorithm Principle
 
 Next, let's construct the recurrence relation for ``M[i][k]`` with the following code:
 
@@ -152,7 +221,8 @@ public class knapsack
         }
 
         System.out.println (M[n][K].isExists ());
-
+	}
+}
 
 ```
 
@@ -181,7 +251,7 @@ System.out.println ("The elements with the following indexes are in the solution
 
 
 
-### The Traditional Knapsack Problem and Variations
+### the Traditional Knapsack Problem and Variations
 
 
 
@@ -237,7 +307,7 @@ else if (j >= W[i]) {
                         M[i][j].setIncludes (true);
                     }
 }
-//new code, note that we're searching for a solution in the same row (i-th row), which means we're looking for a solution that already has some number of i-th elements in it's solution
+//new code, note that we're searching for a solution in the same row (i-th row), which means we're looking for a solution that already has some number of i-th elements (including 0) in it's solution
 else if (j >= W[i]) {
                     if (M[i][j - W[i]].isExists ()) {
                         M[i][j].setExists (true);
@@ -248,9 +318,9 @@ else if (j >= W[i]) {
 
 
 
-### Short lookback concerning Levenshtein distance
+### Short Description of Levenshtein Distance
 
-Another very good example of using dynamic programming is edit distance or Levenshtein distance. Levenshtein distance for given 2 strings `A` and `B` is the number of atomic operations we need to use to transform `A` into `B`. Atomic operations are:
+Another very good example of using dynamic programming is Edit distance or Levenshtein distance. Levenshtein distance for given 2 strings `A` and `B` is the number of atomic operations we need to use to transform `A` into `B`. Atomic operations are:
 
 1. character deletion
 2. character insertion
@@ -263,10 +333,108 @@ $$
 lev_{a,b}(i,j)=min\begin{cases}
 lev_{a,b}(i-1,j)+1\\lev_{a,b}(i,j-1)+1\\lev_{a,b}(i-1,j-1)+c(a_i,b_j)\end{cases}
 $$
-`c(a,b)` being 1 if a==b, and 0 if a!=b. 
+`c(a,b)` being 0 if a==b, and 1 if a!=b. 
 
 For a more detailed article about Levenshtein distance, click [here](<https://stackabuse.com/levenshtein-distance-and-text-similarity-in-python/>).
 
 
 
-### LCS algorithm
+### LCS - Longest Common Subsequence
+
+The problem goes as follows:
+
+> Given two sequences, find the length of the longest subsequence present in both of them. A subsequence is a sequence that appears in the same relative order, but not necessarily contiguous.
+
+#### Clarification
+
+If we have two strings, `s1="MICE"` and `s2="MINCE"`, the longest common **substring** would be "MI" or "CE", however, the longest common **subsequence** would be "MICE" because the elements of the resulting subsequence don't have to be in consecutive order.
+
+#### Recurrence Relation and General Logic
+
+$$
+lcs_{a,b}(i,j)=min\begin{cases}
+lcs_{a,b}(i-1,j)\\lcs_{a,b}(i,j-1)\\lcs_{a,b}(i-1,j-1)+c(a_i,b_j)\end{cases}
+$$
+
+As we can plainly see, there is only a slight difference between Edit distance and LCS, specifically, in the cost of `left` and `up` moves. This means that in LCS, we have no cost for character insertion and character deletion, which means that we only count `diagonal` moves (character substitution), which have a cost of 1 if the two current string characters `a[i]` and `b[j]` are the same. The final cost of LCS is the length of the longest subsequence for the 2 string, which is exactly what we needed.
+
+
+
+> Using this logic, we can boil down a lot of string comparison algorithms to simple recurrence relations which utilize the base formula of the Levenshtein distance. 
+
+
+
+
+#### Implementation
+
+```java
+public class LCS
+{
+    public static void main (String[] args) {
+        String s1=new String ("Hillfinger");
+        String s2=new String ("Hilfiger");
+        int n=s1.length ();
+        int m=s2.length ();
+        int[][] solution_matrix=new int[n + 1][m + 1];
+        for (int i=0 ; i < n ; i++) {
+            solution_matrix[i][0]=0;
+        }
+        for (int i=0 ; i < m ; i++) {
+            solution_matrix[0][i]=0;
+        }
+
+        for (int i=1 ; i <= n ; i++) {
+            for (int j=1 ; j <= m ; j++) {
+                int max1, max2, max3;
+                max1=solution_matrix[i - 1][j];
+                max2=solution_matrix[i][j - 1];
+                if (s1.charAt (i - 1) == s2.charAt (j - 1)) {
+                    max3=solution_matrix[i - 1][j - 1] + 1;
+                } else {
+                    max3=solution_matrix[i - 1][j - 1];
+                }
+                int tmp=Math.max (max1, max2);
+                solution_matrix[i][j]=Math.max (tmp, max3);
+
+            }
+        }
+        System.out.println ("Length of longest subsequence: " + solution_matrix[n][m]);
+
+    }
+}
+
+```
+
+
+
+### Other Problems That Utilize Dynamic Programming
+
+There are a lot more problems that can be solved with dynamic programming, these are just a few of them:
+
+- Partition Problem
+
+  >Given a set of integers, find out if it can be divided into two subsets with equal sums
+
+- Subset Sum Problem
+
+  >Given a set of positive integers, and a value sum, determine if there is a subset of the given set with sum equal to given sum.
+
+- Coin Change Problem (Total number of ways to get the denomination of coins)
+
+  >Given an unlimited supply of coins of given denominations, find the total number of distinct ways to get a desired change.
+
+- Total possible solutions to linear equation of k variables 
+
+  >Given a linear equation of k variables, count total number of possible solutions of it.
+
+- Find Probability that a Drunkard doesn't fall off a cliff (`KIDS, do not try this at home`)
+
+  >Given a linear space representing the distance from a cliff, and providing you know the starting distance of the drunkard from the cliff, and his tendency to go towards the cliff `p` and away from the cliff `1-p`, calculate the probability of his survival.
+
+- Many more...
+
+
+
+### Conclusion
+
+Dynamic programming is a tool that can save us a lot of `computational time` in exchange for a bigger `space complexity`, granted some of them only go halfway (a matrix is needed for memoization, but an ever-changing array is used). This highly on the type of system you're working on, if CPU time is precious, you opt for a `memory savy` solution, on the other hand, if your memory is limited, you opt for a more `time savy` solution for a better `time/space complexity` ratio.  
