@@ -1,24 +1,33 @@
+To understand the concepts of dynamic programming we need to get acquainted with the following subjects:
+
+- [What is Dynamic Programming?](#what-is-dynamic-programming)
+- [Rod Cutting Algorithm](#rod-cutting-algorithm)
+- [The Simplified Knapsack Problem](#the-simplified-knapsack-problem)
+- [The Traditional Knapsack Problem](#the-traditional-knapsack-problem)
+- [Short Description of Levenshtein Distance](#short-description-of-levenshtein-distance)
+- [LCS - Longest Common Subsequence](#lcs-longest-common-subsequence)
+- [Other Problems That Utilize Dynamic Programming](#other-problems-that-utilize-dynamic-programming)
+- [Conclusion](#conclusion)
+
 ### What is Dynamic Programming?
 
-Dynamic programming is a programming principle where a very complex problem can be solved by dividing it into smaller subproblems. This principle is very similar to recursion, but with a key difference, every distinct subproblem has to be solved only ONCE. To understand what this means, we first have to understand the problem of solving recurrence relations. Every single complex problem can be divided into very similar subproblems, this means we can construct a _recurrence relation_ between them. Let's take a look at an example we all are familiar with, the Fibonacci sequence! The Fibonacci sequence is defined with the following `recurrence relation`:
-
+Dynamic programming is a programming principle where a very complex problem can be solved by dividing it into smaller subproblems. This principle is very similar to recursion, but with a key difference, every distinct subproblem has to be solved only **once**. To understand what this means, we first have to understand the problem of solving recurrence relations. Every single complex problem can be divided into very similar subproblems, this means we can construct a _recurrence relation_ between them. Let's take a look at an example we all are familiar with, the Fibonacci sequence! The Fibonacci sequence is defined with the following `recurrence relation`:
 $$
 fibonacci(n)=fibonacci(n-1)+fibonacci(n-2)
 $$
-
 So, if we want to find the `n`-th number in the Fibonacci sequence, we have to know the two numbers preceding the `n`-th in the sequence. However, every single time we want to calculate a different element of the Fibonacci sequence, we have have certain `duplicate` calls in our recursive calls, as can be seen in following image, where we calculate Fibonacci(5):
 
-![Drag Racing](./graphics/fibonacci1.png)
+![Drag Racing](E:\Programming\GitHub\dynamic_programming\graphics\fibonacci1.png)
 
-As you can plainly see, this unmodified recursive solution repeats the same calculations quite a bit,which severely slows down this algorithm. For example, if we want to calculate F(4), we need to calculate F(3) and F(2), however we also need F(2) for F(3). The solution to this problem is `dynamic programming`, where we model a solution as if we were to solve it recursively, but we solve it from the ground up, and **memorize** subproblem solutions. Ergo, for the Fibonacci sequence, we **first** solve and memorize F(1), then F(2), then F(3) using F(2) and F(1) and so on. This means that the calculation of every individual element of the sequence is O(1), because we already know the former two.
+This unmodified recursive solution repeats the same calculations quite a bit,which severely slows down this algorithm. For example, if we want to calculate F(4), we need to calculate F(3) and F(2), however we also need F(2) for F(3). The solution to this problem is `dynamic programming`, where we model a solution as if we were to solve it recursively, but we solve it from the ground up, and **memorize** subproblem solutions. Ergo, for the Fibonacci sequence, we **first** solve and memorize F(1), then F(2), then F(3) using F(2) and F(1) and so on. This means that the calculation of every individual element of the sequence is O(1), because we already know the former two.
 
 
 
 When solving a problem using dynamic programming, we have to follow these steps:
 
-* Determine the recurrence relation that applies to said problem
-* Initialize the memory/array/matrix's starting values 
-* Make sure that when we make a "recursive call" (access the memorized solution of a subproblem) it's always solved
+- Determine the recurrence relation that applies to said problem
+- Initialize the memory/array/matrix's starting values 
+- Make sure that when we make a "recursive call" (access the memorized solution of a subproblem) it's always solved
 
 Following these rules, let's take a look at some examples of algorithms that use dynamic programming:
 
@@ -32,10 +41,9 @@ Let's start with something simple, the problem goes as follows:
 
 #### Naive Solution
 
-This problem is like tailor-made for dynamic programming, but because this is our first real example, let's see what would happen if we try and solve it traditionally:
+This problem is like tailor-made for dynamic programming, but because this is our first real example, let's see how many fires we can start by letting this poor little code run:
 
 ```java
-
 public class naive_solution
 {
     static int getValue (int[] values, int length) {
@@ -57,6 +65,14 @@ public class naive_solution
     }
 }
 ```
+
+**Output**:
+
+```java
+Max rod value: 17
+```
+
+
 
 This solution is highly inefficient, recursive calls aren't memorized so the poor guy has to solve the same subproblem every time there's a single overlapping solution.
 
@@ -89,9 +105,17 @@ public class dp_solution
 }
 ```
 
+**Output**:
+
+```java
+Max rod value: 17
+```
+
+As we can see, the resulting outputs are the same, only with different time/space complexity.
+
 We eliminate the need for recursive calls by solving the subproblems from the ground-up, utilizing the fact that all previous subproblems to a given problem are already solved.
 
-### the Simplified Knapsack Problem
+### The Simplified Knapsack Problem
 
 The Simplified Knapsack problem is a problem of optimization, for which there is no ``one`` solution. The question for this problem would be, does a solution even exist? The problem is as follows:
 
@@ -112,7 +136,6 @@ There are 2 things to note when filling up the matrix, first, does a solution ex
 Next, let's construct the recurrence relation for ``M[i][k]`` with the following code:
 
 ```python
-
 if(M[i-1][k].exists == True):
     M[i][k].exists = True
     M[i][k].includes = False
@@ -226,6 +249,8 @@ public class knapsack
 
 ```
 
+
+
 The only thing that's left is reconstruction of the solution, in the class above, we know that a solution *EXISTS*, however we don't know what it is. For reconstruction we use the following code:
 
 ```java
@@ -251,53 +276,24 @@ System.out.println ("The elements with the following indexes are in the solution
 
 
 
-### the Traditional Knapsack Problem and Variations
-
-
-
-Let's now take a look at the traditional knapsack problem and see how it differs from the simplified variation:
-
-> Given a set of items, each with a weight w1,w2...  and a value v1,v2... determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit `K` and the total value is as large as possible.
-
-In the simplified version, every single solution was equally as good. However, now we have a criteria for finding an **optimal** solution (aka the largest value possible). 
-
-In the implementation we'll be deriving a class from `Elem`, with an added private field `value` for storing the   largest possible value for a given subproblem:
+**Output**:
 
 ```java
-public class Elem_with_value extends Elem
-{
-    private int value;
-	
-	//appropriate constructors, getters and setters
-    
-}
+Insert knapsack capacity:
+12
+Insert number of items:
+5
+Insert weights: 
+9 7 4 10 3
+true
+The elements with the following indexes are in the solution:
+[5, 1]
+
 ```
 
-The implementation is very similar, with the only difference being that now we have to chose the optimal solution judging by the resulting value:
 
-```java
-for (int i=1 ; i <= n ; i++) {
-            for (int j=0 ; j <= K ; j++) {
-                int tmp_max=0;
-                M[i][j]=new Elem_with_value (false, 0);
-                if (M[i - 1][j].isExists ()) {
-                    M[i][j].setExists (true);
-                    M[i][j].setIncludes (false);
-                    tmp_max=M[i - 1][j].getValue ();
-                }
-                if (j >= W[i]) {
-                    if (M[i - 1][j - W[i]].isExists () && tmp_max < M[i - 1][j - W[i]].getValue ()) {
-                        M[i][j].setExists (true);
-                        M[i][j].setIncludes (true);
-                        M[i][j].setValue (M[i - 1][j - W[i]].getValue () + V[i]);
-                    }
-                }
 
-            }
-}
-```
-
-Another variation of the knapsack problem is filling a knapsack with/without value optimization, but now with unlimited amounts of every individual item. This variation can be solved by making a simple adjustment to our existing code:
+A simple variation of the knapsack problem is filling a knapsack without value optimization, but now with unlimited amounts of every individual item. This variation can be solved by making a simple adjustment to our existing code:
 
 ```java
 //old code for simplified knapsack problem
@@ -314,7 +310,86 @@ else if (j >= W[i]) {
                         M[i][j].setIncludes (true);
                     }
 }
+
+
 ```
+
+
+
+### The Traditional Knapsack Problem
+
+
+
+Utilizing both previous variations, let's now take a look at the traditional knapsack problem and see how it differs from the simplified variation:
+
+> Given a set of items, each with a weight w1,w2...  and a value v1,v2... determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit `K` and the total value is as large as possible.
+
+In the simplified version, every single solution was equally as good. However, now we have a criteria for finding an **optimal** solution (aka the largest value possible). Keep in mind, this time we have an **infinite number of each item**, so items can occur multiple times in a solution.
+
+In the implementation we'll be deriving a class from `Elem`, with an added private field `value` for storing the   largest possible value for a given subproblem:
+
+```java
+public class Elem_with_value extends Elem
+{
+    private int value;
+	
+	//appropriate constructors, getters and setters
+    
+}
+
+```
+
+The implementation is very similar, with the only difference being that now we have to chose the optimal solution judging by the resulting value:
+
+```java
+for (int i=1 ; i <= n ; i++) {
+            for (int j=0 ; j <= K ; j++) {
+                M[i][j]=new Elem_with_value (true, M[i - 1][j].getValue ());
+
+                M[i][j].setIncludes (false);
+                M[i][j].setValue (M[i - 1][j].getValue ());
+
+                if (j >= W[i]) {
+                    if ((M[i][j - W[i]].getValue () > 0 || j == W[i])) {
+                        if (M[i][j - W[i]].getValue () + V[i] > M[i][j].getValue ()) {
+                            M[i][j].setIncludes (true);
+                            M[i][j].setValue (M[i][j - W[i]].getValue () + V[i]);
+                        }
+                    }
+                }
+                System.out.print (M[i][j].getValue () + "  ");
+
+            }
+            System.out.println ();
+}
+
+System.out.println ("Value: " + M[n][K].getValue ());
+
+```
+
+
+
+**Output**:
+
+```java
+Insert knapsack capacity:
+12
+Insert number of items:
+5
+Insert weights: 
+9 7 4 10 3
+Insert values: 
+1 2 3 4 5
+0  0  0  0  0  0  0  0  0  1  0  0  0  
+0  0  0  0  0  0  0  2  0  1  0  0  0  
+0  0  0  0  3  0  0  2  6  1  0  5  9  
+0  0  0  0  3  0  0  2  6  1  4  5  9  
+0  0  0  5  3  0  10  8  6  15  13  11  20  
+Value: 20
+
+```
+
+
 
 
 
@@ -364,7 +439,6 @@ As we can plainly see, there is only a slight difference between Edit distance a
 
 
 
-
 #### Implementation
 
 ```java
@@ -403,6 +477,17 @@ public class LCS
     }
 }
 
+
+
+```
+
+
+
+**Output**:
+
+```java
+Length of longest continuous subsequence: 8
+
 ```
 
 
@@ -413,23 +498,23 @@ There are a lot more problems that can be solved with dynamic programming, these
 
 - Partition Problem
 
-  >Given a set of integers, find out if it can be divided into two subsets with equal sums
+  > Given a set of integers, find out if it can be divided into two subsets with equal sums
 
 - Subset Sum Problem
 
-  >Given a set of positive integers, and a value sum, determine if there is a subset of the given set with sum equal to given sum.
+  > Given a set of positive integers, and a value sum, determine if there is a subset of the given set with sum equal to given sum.
 
 - Coin Change Problem (Total number of ways to get the denomination of coins)
 
-  >Given an unlimited supply of coins of given denominations, find the total number of distinct ways to get a desired change.
+  > Given an unlimited supply of coins of given denominations, find the total number of distinct ways to get a desired change.
 
 - Total possible solutions to linear equation of k variables 
 
-  >Given a linear equation of k variables, count total number of possible solutions of it.
+  > Given a linear equation of k variables, count total number of possible solutions of it.
 
 - Find Probability that a Drunkard doesn't fall off a cliff (`KIDS, do not try this at home`)
 
-  >Given a linear space representing the distance from a cliff, and providing you know the starting distance of the drunkard from the cliff, and his tendency to go towards the cliff `p` and away from the cliff `1-p`, calculate the probability of his survival.
+  > Given a linear space representing the distance from a cliff, and providing you know the starting distance of the drunkard from the cliff, and his tendency to go towards the cliff `p` and away from the cliff `1-p`, calculate the probability of his survival.
 
 - Many more...
 
